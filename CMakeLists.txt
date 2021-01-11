@@ -17,6 +17,10 @@ set(AV_BUILD_EXAMPLES On CACHE BOOL "Build example applications (On)")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED yes)
 
+# Used for Diagnostics in CLion (Unneeded in Release version, this configuration can be removed when not needed)
+# This assumes you saved the FFMPEG Source Code Repo in the /opt/ directory
+include_directories(/opt/ffmpeg)
+
 # Warnings
 set (AVCPP_WARNING_OPTIONS
      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
