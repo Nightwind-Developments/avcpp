@@ -29,7 +29,7 @@ using namespace av;
 int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error_code ec, string uri, int count,
                ssize_t videoStream) {
 
-    ictx.openInput(uri, ec);
+    ictx.openInput(uri, InputFormat("mjpeg"), ec);
 
     if (ec) {
         cerr << "Can't open input\n";
