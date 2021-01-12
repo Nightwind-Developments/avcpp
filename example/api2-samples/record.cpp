@@ -28,8 +28,13 @@ using namespace av;
 
 int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error_code ec, string uri, int count,
                ssize_t videoStream) {
+    Dictionary dict = {
+            {
+                "input_format", "mjpeg"
+            }
+    };
 
-    ictx.openInput(uri, InputFormat("v4l2"), ec);
+    ictx.openInput(uri, dict,InputFormat("v4l2"), ec);
 
     if (ec) {
         cerr << "Can't open input\n";
@@ -55,6 +60,9 @@ int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error
 
     if (vst.isValid()) {
         vdec = VideoDecoderContext(vst);
+
+
+        cout<<"width: "<<vdec.width()<<" height: "<< vdec.height()<<endl;
         vdec.setRefCountedFrames(true);
         Codec c = Codec();
 
@@ -109,7 +117,7 @@ int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoE
 
         // READING
         Packet pkt = ictx.readPacket(ec);
-        if (ec) {
+        if (ec.value()) {
             clog << "Packet reading error: " << ec << ", " << ec.message() << endl;
             break;
         }
