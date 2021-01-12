@@ -30,17 +30,29 @@ int main()
     }
 
     {
-        Timestamp ts = std::chrono::microseconds(500);
+        auto start = std::chrono::steady_clock::now();
+        auto end = std::chrono::steady_clock::now();
+        Timestamp elapsed_seconds = end-start;
+        int i = 0;
+        while(elapsed_seconds.seconds() < 5){
+            end = std::chrono::steady_clock::now();
+            elapsed_seconds = end-start;
+            double time = elapsed_seconds.seconds();
+            if(floor(time) == time)
+                cout << i++ << endl;
+        }
+
+        Timestamp ts = elapsed_seconds;
         cout << ts << " = " << ts.seconds() << endl;
 
-        auto ts2 = ts + std::chrono::seconds(5);
-        cout << ts2 << " = " << ts2.seconds() << endl;
-
-        auto dur1 = ts2.toDuration<std::chrono::milliseconds>();
-        cout << dur1.count() << endl;
-
-        auto ts3 = std::chrono::seconds(5) + ts;
-        cout << ts3 << " = " << ts3.seconds() << endl;
+//        auto ts2 = ts + std::chrono::seconds(5);
+//        cout << ts2 << " = " << ts2.seconds() << endl;
+//
+//        auto dur1 = ts2.toDuration<std::chrono::milliseconds>();
+//        cout << dur1.count() << endl;
+//
+//        auto ts3 = std::chrono::seconds(5) + ts;
+//        cout << ts3 << " = " << ts3.seconds() << endl;
 
 
 

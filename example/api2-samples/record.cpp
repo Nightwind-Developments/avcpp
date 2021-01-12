@@ -113,6 +113,9 @@ int setupOutput(VideoDecoderContext &vdec, error_code ec, string out, Stream vst
 
 int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoEncoderContext &encoder, int count,
            FormatContext &octx, ssize_t videoStream) {
+
+    // Going to implement time interval
+
     while (true) {
 
         // READING
