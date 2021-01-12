@@ -167,6 +167,7 @@ static int avcpp_lockmgr_cb(void **ctx, enum AVLockOp op)
 
 void init()
 {
+    cout<<"hello world init"<< endl;
 #if LIBAVFORMAT_VERSION_MAJOR < 58 // FFmpeg 4.0
     av_register_all();
 #endif
