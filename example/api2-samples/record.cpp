@@ -30,11 +30,11 @@ int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error
                ssize_t videoStream) {
     Dictionary dict = {
             {
-                "input_format", "mjpeg"
+                    "input_format", "mjpeg"
             }
     };
 
-    ictx.openInput(uri, dict,InputFormat("v4l2"), ec);
+    ictx.openInput(uri, dict, InputFormat("v4l2"), ec);
 
     if (ec) {
         cerr << "Can't open input\n";
@@ -62,7 +62,7 @@ int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error
         vdec = VideoDecoderContext(vst);
 
 
-        cout<<"width: "<<vdec.width()<<" height: "<< vdec.height()<<endl;
+        cout << "width: " << vdec.width() << " height: " << vdec.height() << endl;
         vdec.setRefCountedFrames(true);
         Codec c = Codec();
 
@@ -115,9 +115,19 @@ int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoE
            FormatContext &octx, ssize_t videoStream) {
 
     // Going to implement time interval
+    auto start = std::chrono::steady_clock::now();
+    auto end = std::chrono::steady_clock::now();
+    Timestamp elapsed_seconds = end - start;
+    int i = 0;
 
-    while (true) {
-
+    while (elapsed_seconds.seconds() < 5) {
+        cout << "secs: " << elapsed_seconds.seconds() << endl;
+        //timer
+        end = std::chrono::steady_clock::now();
+        elapsed_seconds = end - start;
+        double time = elapsed_seconds.seconds();
+        if ((int) time != i)
+            cout << i++ << endl;
         // READING
         Packet pkt = ictx.readPacket(ec);
         if (ec.value()) {

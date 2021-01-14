@@ -7,43 +7,43 @@
 using namespace std;
 using namespace av;
 
-int main()
-{
+int main() {
     {
-        Timestamp a = {1, {1, 1000}};
-        Timestamp b = {2, {1, 3}};
+        //  Timestamp a = {1, {1, 1000}};
+        // Timestamp b = {2, {1, 3}};
 
-        auto c = a + b;
-        cout << c << " = " << c.seconds() << endl;
+        //  auto c = a + b;
+        // cout << c << " = " << c.seconds() << endl;
 
-        auto d = c - b;
-        cout << d << " = " << d.seconds() << endl;
+        // auto d = c - b;
+        //  cout << d << " = " << d.seconds() << endl;
 
-        auto e = a * b;
-        cout << e << " = " << e.seconds() << endl;
+        //  auto e = a * b;
+        // cout << e << " = " << e.seconds() << endl;
 
-        auto f = a / b;
-        cout << f << " = " << f.seconds() << endl;
+        // auto f = a / b;
+        // cout << f << " = " << f.seconds() << endl;
 
-        auto g = Timestamp{300, {1, 2}} / Timestamp{150, {1, 3}};
-        cout << g << " = " << g.seconds() << endl;
+        //  auto g = Timestamp{300, {1, 2}} / Timestamp{150, {1, 3}};
+        //cout << g << " = " << g.seconds() << endl;
     }
 
     {
         auto start = std::chrono::steady_clock::now();
         auto end = std::chrono::steady_clock::now();
-        Timestamp elapsed_seconds = end-start;
+        Timestamp elapsed_seconds = end - start;
         int i = 0;
-        while(elapsed_seconds.seconds() < 5){
+        while (elapsed_seconds.seconds() < 5) {
             end = std::chrono::steady_clock::now();
-            elapsed_seconds = end-start;
+            elapsed_seconds = end - start;
             double time = elapsed_seconds.seconds();
-            if(floor(time) == time)
+            // cout<<time<<endl;
+            if ((int) time != i)
                 cout << i++ << endl;
         }
 
-        Timestamp ts = elapsed_seconds;
-        cout << ts << " = " << ts.seconds() << endl;
+        //Timestamp ts = elapsed_seconds;
+        // cout << ts << " = " << ts.seconds() << endl;
 
 //        auto ts2 = ts + std::chrono::seconds(5);
 //        cout << ts2 << " = " << ts2.seconds() << endl;
