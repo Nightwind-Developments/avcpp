@@ -26,19 +26,19 @@
 using namespace std;
 using namespace av;
 
-int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error_code ec, string uri, int count,
-               ssize_t videoStream) {
-    Dictionary dict = {
-            {
-                    "input_format", "mjpeg"
-            }
-    };
+void setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error_code ec, const string& uri, int count,
+               ssize_t& videoStream) {
+    Dictionary dict;
+
+    dict.set("input_format", "h264");
+    dict.set("video_size", "1920x1080");
 
     ictx.openInput(uri, dict, InputFormat("v4l2"), ec);
+    //ictx.openInput(uri, ec);
 
     if (ec) {
         cerr << "Can't open input\n";
-        return 1;
+        return;
     }
 
     ictx.findStreamInfo();
@@ -46,7 +46,6 @@ int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error
     for (size_t i = 0; i < ictx.streamsCount(); ++i) {
         auto st = ictx.stream(i);
         if (st.mediaType() == AVMEDIA_TYPE_VIDEO) {
-            cout << "here " << i << "   " << st.isVideo() << endl;
             videoStream = i;
             vst = st;
             break;
@@ -55,27 +54,23 @@ int setupInput(VideoDecoderContext &vdec, Stream vst, FormatContext &ictx, error
 
     if (vst.isNull()) {
         cerr << "Video stream not found\n";
-        return 1;
+        return;
     }
 
     if (vst.isValid()) {
         vdec = VideoDecoderContext(vst);
-
-
-        cout << "width: " << vdec.width() << " height: " << vdec.height() << endl;
         vdec.setRefCountedFrames(true);
         Codec c = Codec();
 
         vdec.open(c, ec);
-        cout << vdec.codec().name() << endl;
         if (ec.value()) {
             cerr << "Can't open codec\n" << ec << endl;
-            return 1;
+            return;
         }
     }
 }
 
-int setupOutput(VideoDecoderContext &vdec, error_code ec, string out, Stream vst, VideoEncoderContext &encoder,
+void setupOutput(VideoDecoderContext &vdec, error_code ec, const string& out, const Stream& vst, VideoEncoderContext &encoder,
                 FormatContext &octx, Stream ost) {
 
 
@@ -88,23 +83,22 @@ int setupOutput(VideoDecoderContext &vdec, error_code ec, string out, Stream vst
     encoder.setBitRate(vdec.bitRate());
     ost.setFrameRate(vst.frameRate());
 
+//    octx.openOutput(out, ec);
     octx.openOutput(out, ec);
     if (ec) {
         cerr << "Can't open output\n";
-        return 1;
+        return;
     }
 
     Codec c2 = Codec();
 
     encoder.open(c2, ec);
-    // encoder.setPixelFormat(c2.supportedPixelFormats().back());
+    encoder.setPixelFormat(c2.supportedPixelFormats().back());
 
-    //cout<<"PF: "<<c2.supportedPixelFormats().back()<<endl;
     if (ec) {
         cerr << "Can't open encodec\n";
-        return 1;
+        return;
     }
-    cout << "ererer" << endl;
 
     octx.dump();
     octx.writeHeader();
@@ -120,7 +114,7 @@ int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoE
     Timestamp elapsed_seconds = end - start;
     int i = 0;
 
-    while (elapsed_seconds.seconds() < 5) {
+    while (elapsed_seconds.seconds() < 15) {
         cout << "secs: " << elapsed_seconds.seconds() << endl;
         //timer
         end = std::chrono::steady_clock::now();
@@ -208,7 +202,8 @@ int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoE
                     octx.writePacket(opkt, ec);
                     if (ec) {
                         cerr << "Error write packet: " << ec << ", " << ec.message() << endl;
-                        return 1;
+//                        continue;
+                        return ec.value();
                     }
                 } while (flushEncoder);
             }
@@ -223,6 +218,7 @@ int record(VideoDecoderContext &vdec, FormatContext &ictx, error_code ec, VideoE
     }
 
     octx.writeTrailer();
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -243,7 +239,6 @@ int main(int argc, char **argv) {
 
     int count = 0;
 
-
     OutputFormat ofrmt;
     FormatContext octx;
 
@@ -257,6 +252,12 @@ int main(int argc, char **argv) {
     setupInput(vdec, vst, ictx, ec, uri, count, videoStream);
     setupOutput(vdec, ec, out, vst, encoder,
                 octx, ost);
+
+    cout << "Input Format: " << ictx.inputFormat().name() << endl
+    << "Input Codec: " << vdec.codec().name() << endl
+    << "Output Format: " << octx.outputFormat().name() << endl
+    << "Output Codec: " << ocodec.name() << endl;
+
     return record(vdec, ictx, ec, encoder, count,
                   octx, videoStream);
 
